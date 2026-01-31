@@ -42,7 +42,7 @@ const LandingPage = ({ onLoginClick, onRegisterClick }) => {
               Healthcare <br /> Solutions
             </h1>
             <p className="text-slate-400 text-base max-w-sm leading-relaxed mx-auto md:mx-0">
-              Lorem ipsum dolor sit amet consectetur adipiscing elit. Ab iste eum quam dolores quia possimus incidunt placeat sapiente eaque.
+              Access trusted doctors, book appointments, and manage your health—all in one secure platform.
             </p>
             <button className="px-10 py-4 bg-blue-500 text-white rounded-full font-bold shadow-xl shadow-blue-200 hover:-translate-y-1 transition-transform">
               Find Doctors
@@ -114,7 +114,7 @@ const LandingPage = ({ onLoginClick, onRegisterClick }) => {
             <div className="lg:w-1/2 space-y-8">
               <h3 className="text-4xl font-bold text-[#2d3e50]">Dental Care Service</h3>
               <p className="text-slate-400 leading-relaxed text-lg max-w-lg">
-                Lorem ipsum dolor sit amet consectetur adipiscing elit. Ab iste eum quam dolores quia possimus incidunt placeat sapiente eaque aspernatur aut, quaerat in. Eos in animi aliquam cupiditate tempora iste.
+                We provide comprehensive dental care, from routine checkups to advanced treatments, ensuring healthy and confident smiles for all ages.
               </p>
               <button className="px-10 py-3.5 bg-blue-500 text-white rounded-full font-bold shadow-lg shadow-blue-100 hover:scale-105 transition-all">
                 Learn more
@@ -138,7 +138,7 @@ const LandingPage = ({ onLoginClick, onRegisterClick }) => {
                     <Calendar size={28} />
                 </div>
                 <h3 className="text-4xl font-bold">Online Appointment</h3>
-                <p className="text-blue-100 text-lg opacity-90 max-w-sm">Lorem ipsum dolor sit amet consectetur adipiscing elit. Ab iste eum quam dolores.</p>
+                <p className="text-blue-100 text-lg opacity-90 max-w-sm">Schedule your medical consultations in just a few clicks with verified healthcare professionals.</p>
                 <button className="px-8 py-3 bg-white text-blue-500 rounded-full font-bold hover:shadow-lg transition-all">Learn more</button>
              </div>
              <div className="md:w-1/2 flex justify-end mt-12 md:mt-0 relative">
@@ -159,7 +159,7 @@ const LandingPage = ({ onLoginClick, onRegisterClick }) => {
             <span className="text-blue-400 font-bold text-xs uppercase tracking-widest">Time Table</span>
             <h2 className="text-5xl font-bold text-[#2d3e50] leading-tight">Appointment <br /> Schedules</h2>
             <p className="text-slate-400 text-lg leading-relaxed max-w-md">
-              Lorem ipsum dolor sit amet consectetur adipiscing elit. Ab iste eum quam dolores quia possimus incidunt placeat sapiente eaque aspernatur aut.
+              View available doctor schedules, choose your preferred time, and book appointments with ease.
             </p>
             <button className="px-10 py-3.5 bg-blue-500 text-white rounded-full font-bold shadow-lg shadow-blue-100">Schedules</button>
           </div>
@@ -190,9 +190,9 @@ const LandingPage = ({ onLoginClick, onRegisterClick }) => {
           <span className="text-blue-400 font-bold text-xs uppercase tracking-[0.4em]">Team</span>
           <h2 className="text-4xl font-bold text-[#2d3e50] mt-3 mb-16">Our Doctors</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-             <DoctorCard name="Mamman Bo" role="Cardiologist" />
-             <DoctorCard name="Reda Siana" role="Cardiologist" />
-             <DoctorCard name="Yaroslav Hawa" role="Cardiologist" />
+             <DoctorCard name="Dr. Emma Wilson" role="Cardiologist" />
+             <DoctorCard name="Dr. Daniel Kim" role="Neurologist" />
+             <DoctorCard name="Dr. Sarah Patel" role="Pediatrician" />
           </div>
           <button className="mt-16 px-12 py-3 bg-blue-500 text-white rounded-full font-bold shadow-lg hover:shadow-blue-200 transition-all">See All</button>
         </div>
