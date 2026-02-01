@@ -94,7 +94,7 @@ const LandingPage = () => {
 
           <div className="md:w-1/2 relative flex justify-center mt-12 md:mt-0">
              <div className="relative w-full max-w-xl">
-                <img src={landingPic} alt="Doctor Consultation" className="w-full h-[400px] object-cover rounded-3xl shadow-sm border border-slate-100" />
+                <img src={landingPic} alt="Doctor Consultation" className="w-full h-100 object-cover rounded-3xl shadow-sm border border-slate-100" />
                 <div className="absolute top-4 right-4 bg-white p-3 rounded-xl shadow-lg text-blue-500 border border-slate-50"><Heart fill="currentColor" size={20} /></div>
                 <div className="absolute -bottom-4 left-10 bg-white p-3 rounded-xl shadow-lg text-blue-500 border border-slate-50"><Activity size={20} /></div>
              </div>
@@ -218,7 +218,7 @@ const LandingPage = () => {
 
 // --- SUB-COMPONENTS ---
 const NavDropdown = ({ title, content }) => (
-  <div className="absolute top-12 left-1/2 -translate-x-1/2 w-64 bg-white rounded-2xl shadow-2xl border border-slate-100 p-5 z-[100] animate-in fade-in zoom-in duration-200">
+  <div className="absolute top-12 left-1/2 -translate-x-1/2 w-64 bg-white rounded-2xl shadow-2xl border border-slate-100 p-5 z-100 animate-in fade-in zoom-in duration-200">
     <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-white border-t border-l border-slate-100 rotate-45"></div>
     <h5 className="font-bold text-[#2d3e50] mb-2">{title}</h5>
     <p className="text-xs text-slate-400 leading-relaxed">{content}</p>
