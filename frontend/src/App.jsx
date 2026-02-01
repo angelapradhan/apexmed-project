@@ -1,33 +1,16 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import LandingPage from './pages/LandingPage';
-import LoginPage from './pages/LoginPage';
-import Register from './pages/Register';
+import LoginPage from './pages/LoginPage'; // Tapai ko Login page ko path
 
 function App() {
-  // 'home', 'login', or 'register'
-  const [currentPage, setCurrentPage] = useState('home');
-
-  const renderPage = () => {
-    switch(currentPage) {
-      case 'home':
-        return <LandingPage 
-                  onLoginClick={() => setCurrentPage('login')} 
-                  onRegisterClick={() => setCurrentPage('register')} 
-               />;
-      case 'login':
-        return <LoginPage onSwitch={(page) => setCurrentPage(page)} />;
-      case 'register':
-        return <Register onSwitch={(page) => setCurrentPage(page)} />;
-      default:
-        return <LandingPage />;
-    }
-  };
-
   return (
-    <div className="App">
-      {/* Navigation logic rendering */}
-      {renderPage()}
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/login" element={<LoginPage />} />
+      </Routes>
+    </Router>
   );
 }
 
