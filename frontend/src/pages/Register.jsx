@@ -1,60 +1,108 @@
-import React from 'react';
-import { Activity, Mail, Lock, User, ArrowRight, ShieldCheck } from 'lucide-react';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Eye, EyeOff } from 'lucide-react';
+import backgroundImage from '../assets/background.png';
 
-const Register = ({ onSwitch }) => {
+const Register = () => {
+  const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
   return (
-    <div className="min-h-screen bg-[#f0f7ff] flex items-center justify-center p-6">
-      <div className="max-w-125 w-full bg-white rounded-[40px] shadow-2xl shadow-blue-100 overflow-hidden border border-white">
-        <div className="p-10 md:p-12">
-          {/* Logo */}
-          <div className="flex flex-col items-center mb-8">
-            <div className="w-14 h-14 bg-blue-600 rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-blue-200 -rotate-3">
-              <Activity className="text-white" size={28} />
-            </div>
-            <h2 className="text-3xl font-bold text-slate-800">Create Account</h2>
-            <p className="text-slate-500 mt-2 text-center text-sm">Join ApexMed for better healthcare experience.</p>
+    <div 
+      className="h-screen w-full flex flex-col md:flex-row font-sans relative overflow-hidden bg-cover bg-center bg-no-repeat"
+      style={{ backgroundImage: `url(${backgroundImage})` }}
+    >
+      <div className="absolute inset-0 bg-white/30 backdrop-blur-[2px]"></div>
+
+      {/* --- LEFT SIDE: Branding (Shifted Right) --- */}
+      <div className="hidden md:flex md:w-1/2 items-center justify-start p-16 md:p-20 relative z-10">
+        <div className="max-w-md md:ml-12">
+          <h1 className="text-4xl md:text-5xl font-extrabold text-[#1e293b] leading-tight mb-6 drop-shadow-sm tracking-tight">
+            Join the Healthcare <br /> Revolution
+          </h1>
+          <p className="text-lg text-slate-800 leading-relaxed font-semibold opacity-90">
+            Create your account today and take control of your health journey with ApexMed.
+          </p>
+        </div>
+      </div>
+
+      {/* --- RIGHT SIDE --- */}
+      <div className="flex-1 flex items-center justify-center p-4 relative z-10">
+        <div className="w-full max-w-105 bg-white/90 backdrop-blur-md rounded-[28px] p-8 shadow-[0_20px_50px_-12px_rgba(0,0,0,0.15)] border border-white/50">
+          
+          <div className="mb-5 text-center md:text-left">
+            <h2 className="text-[28px] font-bold text-slate-900 mb-0.5">Sign Up</h2>
+            <p className="text-slate-500 text-xs font-bold uppercase tracking-wider">Join ApexMed Today</p>
           </div>
 
-          <form onSubmit={(e) => e.preventDefault()} className="space-y-4">
+          <form onSubmit={(e) => e.preventDefault()} className="space-y-3.5">
             <div className="space-y-1">
-              <label className="text-[11px] font-bold text-slate-500 uppercase tracking-widest ml-1">Full Name</label>
-              <div className="relative group">
-                <User className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600" size={18} />
-                <input type="text" placeholder="Angela Pradhan" className="w-full bg-slate-50 border border-slate-100 rounded-2xl py-4 pl-12 pr-4 focus:ring-4 focus:ring-blue-500/5 focus:border-blue-600 transition-all outline-none" />
+              <label className="text-[12px] font-bold text-slate-700 ml-1">Full Name</label>
+              <input 
+                type="text" 
+                placeholder="Full Name"
+                className="w-full bg-white/80 border border-slate-200 rounded-xl py-2.5 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-slate-500 placeholder:text-slate-300"
+              />
+            </div>
+
+            <div className="space-y-1">
+              <label className="text-[12px] font-bold text-slate-700 ml-1">Email</label>
+              <input 
+                type="email" 
+                placeholder="Email"
+                className="w-full bg-white/80 border border-slate-200 rounded-xl py-2.5 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-slate-500 placeholder:text-slate-300"
+              />
+            </div>
+
+            <div className="space-y-1">
+              <label className="text-[12px] font-bold text-slate-700 ml-1">Password</label>
+              <div className="relative">
+                <input 
+                  type={showPassword ? "text" : "password"} 
+                  placeholder="Password"
+                  className="w-full bg-white/80 border border-slate-200 rounded-xl py-2.5 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-slate-500 placeholder:text-slate-300"
+                />
+                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400">
+                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
               </div>
             </div>
 
             <div className="space-y-1">
-              <label className="text-[11px] font-bold text-slate-500 uppercase tracking-widest ml-1">Email Address</label>
-              <div className="relative group">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600" size={18} />
-                <input type="email" placeholder="angelapradhan@gmail.com" className="w-full bg-slate-50 border border-slate-100 rounded-2xl py-4 pl-12 pr-4 focus:ring-4 focus:ring-blue-500/5 focus:border-blue-600 transition-all outline-none" />
+              <label className="text-[12px] font-bold text-slate-700 ml-1">Confirm Password</label>
+              <div className="relative">
+                <input 
+                  type={showConfirmPassword ? "text" : "password"} 
+                  placeholder="Repeat Password"
+                  className="w-full bg-white/80 border border-slate-200 rounded-xl py-2.5 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-slate-500 placeholder:text-slate-300"
+                />
+                <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400">
+                  {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
               </div>
             </div>
 
-            <div className="space-y-1">
-              <label className="text-[11px] font-bold text-slate-500 uppercase tracking-widest ml-1">Password</label>
-              <div className="relative group">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600" size={18} />
-                <input type="password" placeholder="••••••••" className="w-full bg-slate-50 border border-slate-100 rounded-2xl py-4 pl-12 pr-4 focus:ring-4 focus:ring-blue-500/5 focus:border-blue-600 transition-all outline-none" />
-              </div>
+            <button className="w-full bg-[#1b63fb] text-white font-bold py-3 rounded-xl hover:bg-blue-700 transition-all shadow-lg shadow-blue-200 mt-1 text-sm active:scale-[0.99]">
+              Sign Up
+            </button>
+
+            <div className="relative flex items-center py-2">
+                <div className="grow border-t border-slate-200"></div>
+                <span className="shrink mx-4 text-slate-500 text-[9px] font-bold uppercase tracking-widest">Or sign up with</span>
+                <div className="grow border-t border-slate-200"></div>
             </div>
 
-            <div className="flex items-start gap-3 py-2">
-              <input type="checkbox" className="mt-1 rounded border-slate-300 text-blue-600" />
-              <p className="text-xs text-slate-500 leading-snug">
-                I agree to the <span className="text-blue-600 font-bold">Terms</span> and <span className="text-blue-600 font-bold">Privacy Policy</span>.
-              </p>
-            </div>
-
-            <button className="w-full bg-blue-600 text-white font-bold py-4 rounded-2xl hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all transform active:scale-[0.98] flex items-center justify-center gap-2">
-              Get Started <ArrowRight size={18} />
+            {/* Single Google Button */}
+            <button className="w-full flex items-center justify-center gap-2 py-3 bg-white border border-slate-200 rounded-xl text-[12px] font-bold text-slate-700 hover:bg-slate-50 shadow-sm transition-colors">
+                <img src="https://www.svgrepo.com/show/355037/google.svg" className="h-4 w-4" alt="Google" />
+                Sign up with Google
             </button>
           </form>
 
-          <p className="mt-8 text-center text-slate-500 text-sm">
-            Already a member? {' '}
-            <button onClick={() => onSwitch('login')} className="text-blue-600 font-bold hover:underline">Login</button>
+          <p className="mt-5 text-center text-slate-600 text-xs font-bold">
+            Already have an account? {' '}
+            <button onClick={() => navigate('/login')} className="text-[#1b63fb] font-extrabold hover:underline">Sign In</button>
           </p>
         </div>
       </div>
