@@ -114,7 +114,7 @@ const LandingPage = () => {
                 </div>
                 <Clock size={36} className="opacity-80" />
              </div>
-             <p className="text-[11px] opacity-60">Informatica Nederland B.V.</p>
+             <p className="text-[11px] opacity-60">ApexMed Healthcare Solutions</p>
           </div>
           <ActionCard 
             title="Appointment" 
@@ -193,7 +193,7 @@ const LandingPage = () => {
       </section>
 
       {/* --- 7. FOOTER / CONTACT --- */}
-      <footer ref={footerSectionRef} className="bg-[#5a8c8c] text-white pt-16 pb-8 px-6 md:px-20 mt-20">
+      <footer ref={footerSectionRef} className="bg-[#1b1a1a] text-white pt-16 pb-8 px-6 md:px-20 mt-20">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row items-center justify-between border-t border-white/10 pt-8 gap-8">
             <div className="flex items-center gap-2">
@@ -204,9 +204,6 @@ const LandingPage = () => {
               <div className="flex items-center gap-2"><Phone size={18} /><span>(+977) 9876543210</span></div>
               <div className="flex items-center gap-2"><Mail size={18} /><span>info@apexmed.com</span></div>
               <div className="flex items-center gap-2"><MapPin size={18} /><span>Kathmandu, Nepal</span></div>
-            </div>
-            <div className="flex gap-5">
-              <Facebook size={20} className="hover:scale-110 cursor-pointer" /><Twitter size={20} className="hover:scale-110 cursor-pointer" /><Youtube size={20} className="hover:scale-110 cursor-pointer" />
             </div>
           </div>
           <div className="text-center mt-12 text-xs text-blue-50 opacity-60">© 2026 ApexMed Healthcare Solutions</div>
