@@ -2,11 +2,45 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff } from 'lucide-react';
 import backgroundImage from '../assets/background.png';
+import { createUserApi } from "../services/api"; // Updated path
+import { toast } from "react-hot-toast";
 
 const Register = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  // States for input fields
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+
+  const handleRegister = async (e) => {
+    e.preventDefault();
+
+    // Basic Validation
+    if (password !== confirmPassword) {
+      toast.error("Passwords do not match!");
+      return;
+    }
+
+    const data = { username, email, password };
+
+    try {
+      const res = await createUserApi(data);
+      if (res.data.success) {
+        toast.success(res.data.message);
+        navigate('/login');
+      } else {
+        toast.error(res.data.message);
+      }
+    } catch (error) {
+      console.error(error);
+      const errorMsg = error.response?.data?.message || "Registration failed!";
+      toast.error(errorMsg);
+    }
+  };
 
   return (
     <div 
@@ -15,7 +49,7 @@ const Register = () => {
     >
       <div className="absolute inset-0 bg-white/30 backdrop-blur-[2px]"></div>
 
-      {/* --- LEFT SIDE: Branding (Shifted Right) --- */}
+      {/* --- LEFT SIDE: Branding --- */}
       <div className="hidden md:flex md:w-1/2 items-center justify-start p-16 md:p-20 relative z-10">
         <div className="max-w-md md:ml-12">
           <h1 className="text-4xl md:text-5xl font-extrabold text-[#1e293b] leading-tight mb-6 drop-shadow-sm tracking-tight">
@@ -29,20 +63,23 @@ const Register = () => {
 
       {/* --- RIGHT SIDE --- */}
       <div className="flex-1 flex items-center justify-center p-4 relative z-10">
-        <div className="w-full max-w-105 bg-white/90 backdrop-blur-md rounded-[28px] p-8 shadow-[0_20px_50px_-12px_rgba(0,0,0,0.15)] border border-white/50">
+        <div className="w-full max-w-[420px] bg-white/90 backdrop-blur-md rounded-[28px] p-8 shadow-xl border border-white/50">
           
           <div className="mb-5 text-center md:text-left">
             <h2 className="text-[28px] font-bold text-slate-900 mb-0.5">Sign Up</h2>
             <p className="text-slate-500 text-xs font-bold uppercase tracking-wider">Join ApexMed Today</p>
           </div>
 
-          <form onSubmit={(e) => e.preventDefault()} className="space-y-3.5">
+          <form onSubmit={handleRegister} className="space-y-3.5">
             <div className="space-y-1">
-              <label className="text-[12px] font-bold text-slate-700 ml-1">Full Name</label>
+              <label className="text-[12px] font-bold text-slate-700 ml-1">Username</label>
               <input 
                 type="text" 
-                placeholder="Full Name"
-                className="w-full bg-white/80 border border-slate-200 rounded-xl py-2.5 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-slate-500 placeholder:text-slate-300"
+                placeholder="Username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                className="w-full bg-white/80 border border-slate-200 rounded-xl py-2.5 px-4 text-sm focus:border-blue-500 outline-none text-slate-700"
+                required
               />
             </div>
 
@@ -51,7 +88,10 @@ const Register = () => {
               <input 
                 type="email" 
                 placeholder="Email"
-                className="w-full bg-white/80 border border-slate-200 rounded-xl py-2.5 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-slate-500 placeholder:text-slate-300"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full bg-white/80 border border-slate-200 rounded-xl py-2.5 px-4 text-sm focus:border-blue-500 outline-none text-slate-700"
+                required
               />
             </div>
 
@@ -61,7 +101,10 @@ const Register = () => {
                 <input 
                   type={showPassword ? "text" : "password"} 
                   placeholder="Password"
-                  className="w-full bg-white/80 border border-slate-200 rounded-xl py-2.5 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-slate-500 placeholder:text-slate-300"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full bg-white/80 border border-slate-200 rounded-xl py-2.5 px-4 text-sm focus:border-blue-500 outline-none text-slate-700"
+                  required
                 />
                 <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400">
                   {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
@@ -75,7 +118,10 @@ const Register = () => {
                 <input 
                   type={showConfirmPassword ? "text" : "password"} 
                   placeholder="Repeat Password"
-                  className="w-full bg-white/80 border border-slate-200 rounded-xl py-2.5 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-slate-500 placeholder:text-slate-300"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="w-full bg-white/80 border border-slate-200 rounded-xl py-2.5 px-4 text-sm focus:border-blue-500 outline-none text-slate-700"
+                  required
                 />
                 <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400">
                   {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
@@ -83,20 +129,8 @@ const Register = () => {
               </div>
             </div>
 
-            <button className="w-full bg-[#1b63fb] text-white font-bold py-3 rounded-xl hover:bg-blue-700 transition-all shadow-lg shadow-blue-200 mt-1 text-sm active:scale-[0.99]">
+            <button type="submit" className="w-full bg-[#1b63fb] text-white font-bold py-3 rounded-xl hover:bg-blue-700 transition-all shadow-lg shadow-blue-200 mt-1 text-sm active:scale-[0.99]">
               Sign Up
-            </button>
-
-            <div className="relative flex items-center py-2">
-                <div className="grow border-t border-slate-200"></div>
-                <span className="shrink mx-4 text-slate-500 text-[9px] font-bold uppercase tracking-widest">Or sign up with</span>
-                <div className="grow border-t border-slate-200"></div>
-            </div>
-
-            {/* Single Google Button */}
-            <button className="w-full flex items-center justify-center gap-2 py-3 bg-white border border-slate-200 rounded-xl text-[12px] font-bold text-slate-700 hover:bg-slate-50 shadow-sm transition-colors">
-                <img src="https://www.svgrepo.com/show/355037/google.svg" className="h-4 w-4" alt="Google" />
-                Sign up with Google
             </button>
           </form>
 
