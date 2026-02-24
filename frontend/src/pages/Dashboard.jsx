@@ -158,6 +158,14 @@ const TreatmentCard = ({ doctor, spec, date, time, img, color = "bg-blue-50" }) 
   </div>
 );
 
-
+const DoctorTinyCard = ({ name, spec, active = false }) => (
+  <div className={`p-4 rounded-[24px] border text-center transition-all cursor-pointer ${active ? 'bg-white border-blue-200 shadow-md ring-4 ring-blue-50' : 'bg-white/40 border-white/50 hover:bg-white/80'}`}>
+    <div className="w-10 h-10 bg-slate-100 rounded-xl mx-auto mb-2 overflow-hidden">
+      <img src={`https://ui-avatars.com/api/?name=${name}&background=random`} alt={name} />
+    </div>
+    <h5 className="text-[11px] font-bold text-slate-800 whitespace-nowrap">{name}</h5>
+    <p className="text-[9px] text-slate-400 font-medium">{spec}</p>
+  </div>
+);
 
 export default Dashboard;
