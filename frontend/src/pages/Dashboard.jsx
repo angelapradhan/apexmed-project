@@ -131,6 +131,33 @@ const SidebarIcon = ({ icon, active = false }) => (
   </div>
 );
 
+const TreatmentCard = ({ doctor, spec, date, time, img, color = "bg-blue-50" }) => (
+  <div className="bg-white/80 backdrop-blur-sm rounded-[28px] p-6 shadow-sm border border-white flex flex-col gap-4">
+    <div className="flex items-center gap-4">
+      <img src={img} className="w-12 h-12 rounded-2xl object-cover shadow-sm" alt={doctor} />
+      <div>
+        <h4 className="font-bold text-slate-800 text-sm">{doctor}</h4>
+        <p className="text-[11px] text-slate-400 font-medium">{spec}</p>
+      </div>
+    </div>
+    <div className="flex gap-2">
+      <div className="flex-1 bg-slate-50 p-3 rounded-2xl">
+        <div className="text-[9px] text-slate-400 uppercase font-bold tracking-wider mb-1">Date</div>
+        <div className="text-xs font-bold text-slate-700">{date}</div>
+      </div>
+      <div className="flex-1 bg-slate-50 p-3 rounded-2xl">
+        <div className="text-[9px] text-slate-400 uppercase font-bold tracking-wider mb-1">Time</div>
+        <div className="text-xs font-bold text-slate-700">{time}</div>
+      </div>
+    </div>
+    <div className="flex gap-2">
+      <button className="flex-1 bg-blue-600 text-white text-[11px] font-bold py-2.5 rounded-xl">Appointment</button>
+      <button className="p-2.5 bg-orange-50 text-orange-400 rounded-xl"><Phone size={16} /></button>
+      <button className="p-2.5 bg-blue-50 text-blue-400 rounded-xl"><MessageSquare size={16} /></button>
+    </div>
+  </div>
+);
+
 
 
 export default Dashboard;
