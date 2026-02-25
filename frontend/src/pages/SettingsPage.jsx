@@ -113,3 +113,24 @@ const InputGroup = ({ label, type = "text", value, placeholder, disabled = false
   </div>
 );
 
+const ToggleRow = ({ icon, title, desc, active, onToggle }) => (
+  <div className="flex items-center justify-between p-3 bg-slate-50/30 rounded-xl border border-slate-50">
+    <div className="flex items-center gap-3">
+      <div className="p-2 bg-white text-blue-600 rounded-lg shadow-xs border border-slate-50">
+        {icon}
+      </div>
+      <div>
+        <p className="font-bold text-slate-700 text-[11px]">{title}</p>
+        <p className="text-[9px] text-slate-400 uppercase font-bold tracking-tighter">{desc}</p>
+      </div>
+    </div>
+    <button 
+      onClick={onToggle}
+      className={`w-9 h-5 rounded-full transition-all relative ${active ? 'bg-blue-600' : 'bg-slate-200'}`}
+    >
+      <div className={`absolute top-1 w-3 h-3 bg-white rounded-full transition-all ${active ? 'right-1' : 'left-1'}`} />
+    </button>
+  </div>
+);
+
+export default SettingsPage;
