@@ -2,6 +2,8 @@ const User = require("../models/user.js");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const nodemailer = require('nodemailer');
+const Favorite = require('../models/favouriteModel.js');
+const Doctor = require('../models/services');
 
 const addUser = async (req, res) => {
     try {
@@ -44,7 +46,7 @@ const loginUser = async (req, res) => {
 
         // Token generate garne
         const token = jwt.sign(
-            { id: user.id , role: user.role},  //role admin ko lagi add gareko
+            { id: user.id, role: user.role },  //role admin ko lagi add gareko
             process.env.JWT_SECRET || "default_secret", // Fallback if .env fails
             { expiresIn: "1d" }
         );
@@ -53,7 +55,8 @@ const loginUser = async (req, res) => {
             success: true,
             message: "Login successful",
             token: token,
-            user: { id: user.id, username: user.username, email: user.email ,
+            user: {
+                id: user.id, username: user.username, email: user.email,
                 role: user.role
             } // yeta ne admin ko lagi role
         });
@@ -165,7 +168,7 @@ const deleteUser = async (req, res) => {
     try {
         const { id } = req.params;
         const user = await User.findByPk(id);
-        
+
         if (!user) {
             return res.status(404).json({ success: false, message: "User not found" });
         }
@@ -186,18 +189,73 @@ const getUserCount = async (req, res) => {
             where: {
                 role: 'user' // Kebal user haru matra count hunchha, admin count hudaina
             }
-        }); 
-        
-        res.status(200).json({ 
-            success: true, 
-            count: count 
+        });
+
+        res.status(200).json({
+            success: true,
+            count: count
         });
     } catch (error) {
         console.error("Error fetching user count:", error);
-        res.status(500).json({ 
-            success: false, 
-            message: "Server error while fetching count" 
+        res.status(500).json({
+            success: false,
+            message: "Server error while fetching count"
         });
+    }
+};
+
+//fav
+const toggleFavorite = async (req, res) => {
+    const { userId, doctorId } = req.body;
+    try {
+        const existingFav = await Favorite.findOne({ where: { userId, doctorId } });
+
+        if (existingFav) {
+            await existingFav.destroy();
+            return res.json({ 
+                success: true, 
+                isFavorite: false, 
+                message: "Removed from favourites" 
+            });
+        } else {
+            await Favorite.create({ userId, doctorId });
+            return res.json({ 
+                success: true, 
+                isFavorite: true, 
+                message: "Added to favourites" // <-- Yo message front-end ma alert ma aauchha
+            });
+        }
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+const getMyFavorites = async (req, res) => {
+    try {
+        const userId = req.user.id; // authGuard le pathako ID
+        const favorites = await Favorite.findAll({
+            where: { userId },
+            include: [{
+                model: Doctor,
+                as: 'doctorDetails' // Mathi model ma define gareko name
+            }]
+        });
+        res.json({ success: true, favorites });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+const checkFavoriteStatus = async (req, res) => {
+    const { userId, doctorId } = req.body;
+    try {
+        const favorite = await Favorite.findOne({ where: { userId, doctorId } });
+        res.json({
+            success: true,
+            isFavorite: !!favorite // Yedi bhetiyo bhane true, natra false
+        });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
     }
 };
 
@@ -210,5 +268,8 @@ module.exports = {
     resetPassword,
     getAllUsers, // <--- Add this
     deleteUser,
-    getUserCount
+    getUserCount,
+    toggleFavorite,
+    getMyFavorites,
+    checkFavoriteStatus
 };
