@@ -8,7 +8,10 @@ const {
     loginUser, 
     forgotPassword, 
     verifyOTP, 
-    resetPassword 
+    resetPassword,
+    toggleFavorite,
+    getMyFavorites,
+    checkFavoriteStatus
 } = require('../controllers/userController');
 
 const authGuard = require("../helpers/authguard");
@@ -21,10 +24,18 @@ router.post('/forgot-password', forgotPassword);
 router.post('/verify-otp', verifyOTP); 
 router.post('/reset-password', resetPassword);
 
+// --- Favorite Route ---
+router.post('/toggle-favorite', authGuard, toggleFavorite);
+router.get('/get-my-favorites', authGuard, getMyFavorites);
+router.post('/check-favorite-status', authGuard, checkFavoriteStatus);
+
+
 //appointment 
 router.get("/get-my-appointments", authGuard, getUserAppointments);
 
 // user sees doctors list
 router.get("/get-services", authGuard, getAllServices);
+
+
 
 module.exports = router;
