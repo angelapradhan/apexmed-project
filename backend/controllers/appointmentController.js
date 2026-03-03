@@ -1,7 +1,7 @@
 const Appointment = require("../models/appointment");
 const HospitalBooking = require('../models/hospitalBooking');
 
-// 1. Admin logic: Appointment create garne
+// Create doctor appointment
 const createAppointment = async (req, res) => {
     try {
         const { userId, doctorName, specialization, date, time } = req.body;
@@ -14,59 +14,44 @@ const createAppointment = async (req, res) => {
     }
 };
 
-// const getAllAppointments = async (req, res) => {
-//     try {
-//         const appointments = await Appointment.findAll(); 
-//         res.status(200).json({ success: true, appointments });
-//     } catch (error) {
-//         res.status(500).json({ success: false, message: error.message });
-//     }
-// };
-// 🌟 FIX 2: Updated to fetch both Doctor and Hospital bookings 🌟
+// Get all bookings 
 const getAllAppointments = async (req, res) => {
     try {
-        // 1. Fetch ALL Doctor Bookings
         const doctorBookings = await Appointment.findAll();
-
-        // 2. Fetch ALL Hospital Bookings
         const hospitalBookings = await HospitalBooking.findAll();
 
-        // 3. Map hospital bookings to match the doctor booking structure
+        // Format hospital data to match
         const formattedHospitalBookings = hospitalBookings.map(booking => ({
             id: booking.id, 
             patientName: booking.patientName,
-            // 🌟 Map necessary fields 🌟
             doctorName: booking.hospitalName, 
             specialization: 'Hospital Booking', 
             date: booking.date,
             time: booking.time || 'N/A',
             status: booking.status || 'Pending',
-            type: 'hospital' // 🌟 Add type for identification 🌟
+            type: 'hospital' 
         }));
 
-        // 4. Merge them
-        // 🌟 FIX: Add .toJSON() if needed 🌟
+        // Merge and sort by date
         const allAppointments = [
             ...doctorBookings.map(b => ({ ...b.toJSON(), type: 'doctor' })), 
             ...formattedHospitalBookings
         ];
 
-        // 5. Sort by date
         allAppointments.sort((a, b) => new Date(b.date) - new Date(a.date));
 
         res.status(200).json({ 
             success: true, 
             appointments: allAppointments,
-            count: allAppointments.length // 🌟 Total count includes both 🌟
+            count: allAppointments.length 
         });
     } catch (error) {
-        // 🌟 FIX: Check console for exact error 🌟
-        console.error("Error fetching appointments:", error);
+        console.error("Fetch Error:", error);
         res.status(500).json({ success: false, message: error.message });
     }
 };
 
-// 2. User logic: Aafno matra appointment herne
+// Get appointments 
 const getUserAppointments = async (req, res) => {
     try {
         const appointments = await Appointment.findAll({ where: { userId: req.user.id } });
@@ -76,4 +61,28 @@ const getUserAppointments = async (req, res) => {
     }
 };
 
-module.exports = { createAppointment, getUserAppointments , getAllAppointments};
+// Update status by type
+const updateAppointmentStatus = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { status, type } = req.body;
+
+        if (type === 'hospital') {
+            await HospitalBooking.update({ status: status }, { where: { id: id } });
+        } else {
+            await Appointment.update({ status: status }, { where: { id: id } });
+        }
+
+        res.status(200).json({ success: true, message: "Status updated successfully" });
+    } catch (error) {
+        console.error("Update Error:", error);
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+module.exports = { 
+    createAppointment, 
+    getUserAppointments, 
+    getAllAppointments,
+    updateAppointmentStatus
+};
