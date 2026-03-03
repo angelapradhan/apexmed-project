@@ -4,6 +4,10 @@ const jwt = require("jsonwebtoken");
 const nodemailer = require('nodemailer');
 const Favorite = require('../models/favouriteModel.js');
 const Doctor = require('../models/services');
+const Notification = require('../models/notification');
+const Hospital = require('../models/hospital_model.js');
+const path = require('path');
+const fs = require('fs');
 
 const addUser = async (req, res) => {
     try {
@@ -46,8 +50,8 @@ const loginUser = async (req, res) => {
 
         // Token generate garne
         const token = jwt.sign(
-            { id: user.id, role: user.role },  //role admin ko lagi add gareko
-            process.env.JWT_SECRET || "default_secret", // Fallback if .env fails
+            { id: user.id, role: user.role },
+            process.env.JWT_SECRET || "default_secret",
             { expiresIn: "1d" }
         );
 
@@ -56,9 +60,12 @@ const loginUser = async (req, res) => {
             message: "Login successful",
             token: token,
             user: {
-                id: user.id, username: user.username, email: user.email,
-                role: user.role
-            } // yeta ne admin ko lagi role
+                id: user.id,
+                username: user.username,
+                email: user.email,
+                role: user.role,
+                profilePicture: user.profilePicture
+            }
         });
     } catch (error) {
         console.log(error);
@@ -66,7 +73,7 @@ const loginUser = async (req, res) => {
     }
 };
 
-// 1. FORGOT PASSWORD - Send OTP
+// forgor password
 const forgotPassword = async (req, res) => {
     const { email } = req.body;
     try {
@@ -75,62 +82,86 @@ const forgotPassword = async (req, res) => {
             return res.status(404).json({ success: false, message: "User not found with this email" });
         }
 
+        // 6 digit otp
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
-        // DBeaver ko column name anusar 'otpexpires' (all small) use gareko
+        // Set expiration time (1 hour from now)
+        const expires = new Date(Date.now() + 3600000);
+
         user.otp = otp;
-        user.otpexpires = new Date(Date.now() + 3600000);
-        await user.save();
+        user.otpexpires = expires;
+        await user.save(); 
 
-        console.log("-----------------------------------------");
-        console.log(`🚀 DEBUG: OTP for ${email} is: ${otp}`);
-        console.log("-----------------------------------------");
-
+        
+        console.log(` DEBUG: OTP for ${email} is: ${otp}`);
+        
+        // Nodemailer Configuration
         const transporter = nodemailer.createTransport({
             host: 'smtp.gmail.com',
             port: 465,
-            secure: true,
+            secure: true, 
             auth: {
-                user: process.env.EMAIL_USER,
-                pass: process.env.EMAIL_PASS
+                user: process.env.EMAIL_USER, 
+                pass: process.env.EMAIL_PASS  
             },
             tls: { rejectUnauthorized: false }
         });
 
+        // Send Email
         await transporter.sendMail({
             from: `"ApexMed Support" <${process.env.EMAIL_USER}>`,
             to: email,
             subject: "Password Reset OTP - ApexMed",
-            html: `<h3>Your OTP is: <b>${otp}</b></h3><p>Valid for 1 hour.</p>`
+            html: `
+                <div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
+                    <h2>Password Reset Request</h2>
+                    <p>Hello,</p>
+                    <p>Your verification code for ApexMed is:</p>
+                    <h3 style="background-color: #f4f4f4; padding: 10px; text-align: center; letter-spacing: 5px;">${otp}</h3>
+                    <p>This code is valid for <strong>1 hour</strong>.</p>
+                    <p>If you did not request this, please ignore this email.</p>
+                </div>
+            `
         });
 
         res.status(200).json({ success: true, message: "OTP sent to your email" });
 
     } catch (error) {
         console.error("Forgot Password Error:", error);
-        res.status(500).json({ success: false, message: error.message });
+        res.status(500).json({ success: false, message: "Server error, please try again later" });
     }
 };
 
-/// 2. VERIFY OTP - Yo thau ma mismatch thiyo, aba fix bhayo
+// verify otpp
 const verifyOTP = async (req, res) => {
     const { email, otp } = req.body;
     try {
         if (!email || !otp) return res.status(400).json({ success: false, message: "Email and OTP required" });
 
+        console.log(` DEBUG: Verifying OTP for ${email}`);
+        console.log(` DEBUG: Received OTP: ${otp} (Type: ${typeof otp})`);
+
         const user = await User.findOne({ where: { email, otp: otp.toString() } });
 
-        if (!user || new Date(user.otpexpires) < new Date()) {
-            return res.status(400).json({ success: false, message: "Invalid or expired OTP" });
+        if (!user) {
+            console.log("❌ DEBUG: User not found with this email/otp combination");
+            return res.status(400).json({ success: false, message: "Invalid OTP" });
         }
 
+        if (new Date(user.otpexpires) < new Date()) {
+            console.log("❌ DEBUG: OTP expired");
+            return res.status(400).json({ success: false, message: "OTP expired" });
+        }
+
+        console.log("✅ DEBUG: OTP Verified Successfully");
         res.status(200).json({ success: true, message: "OTP verified successfully" });
     } catch (error) {
+        console.error("Verify OTP Error:", error);
         res.status(500).json({ success: false, message: error.message });
     }
 };
 
-// 3. RESET PASSWORD
+// reset
 const resetPassword = async (req, res) => {
     const { email, password } = req.body;
     try {
@@ -150,10 +181,8 @@ const resetPassword = async (req, res) => {
 };
 
 
-// --- ADMIN: Sabai users ko list nikalne ---
 const getAllUsers = async (req, res) => {
     try {
-        // Password pathaunu hudaina, tesaile exclude gareko
         const users = await User.findAll({
             attributes: { exclude: ['password', 'otp', 'otpexpires'] }
         });
@@ -163,7 +192,6 @@ const getAllUsers = async (req, res) => {
     }
 };
 
-// --- ADMIN: User delete garne ---
 const deleteUser = async (req, res) => {
     try {
         const { id } = req.params;
@@ -180,14 +208,11 @@ const deleteUser = async (req, res) => {
     }
 };
 
-// --- ADMIN: Total users ko sankhya nikalne ---
-// --- ADMIN: Kebal 'user' role bhayekaharu ko matra count nikalne ---
 const getUserCount = async (req, res) => {
     try {
-        // Sequelize ma 'where' condition halera filter garne
         const count = await User.count({
             where: {
-                role: 'user' // Kebal user haru matra count hunchha, admin count hudaina
+                role: 'user'
             }
         });
 
@@ -206,70 +231,220 @@ const getUserCount = async (req, res) => {
 
 //fav
 const toggleFavorite = async (req, res) => {
-    const { userId, doctorId } = req.body;
+
+    const { userId, doctorId, hospitalId, type } = req.body;
+
     try {
-        const existingFav = await Favorite.findOne({ where: { userId, doctorId } });
+        let existingFav;
+
+        if (type === 'hospital') {
+            existingFav = await Favorite.findOne({ where: { userId, hospitalId } });
+        } else {
+            existingFav = await Favorite.findOne({ where: { userId, doctorId } });
+        }
 
         if (existingFav) {
             await existingFav.destroy();
-            return res.json({ 
-                success: true, 
-                isFavorite: false, 
-                message: "Removed from favourites" 
+            return res.json({
+                success: true,
+                isFavorite: false,
+                message: "Removed from favorites"
             });
         } else {
-            await Favorite.create({ userId, doctorId });
-            return res.json({ 
-                success: true, 
-                isFavorite: true, 
-                message: "Added to favourites" // <-- Yo message front-end ma alert ma aauchha
+            const newFavData = { userId, type };
+            if (type === 'hospital') {
+                newFavData.hospitalId = hospitalId;
+            } else {
+                newFavData.doctorId = doctorId;
+            }
+
+            await Favorite.create(newFavData);
+
+            try {
+                await Notification.create({
+                    userId: 'ADMIN',  
+                    title: 'New Favourite Added',
+                    message: `User ${req.body.userId} added a favorite.`,
+                    type: 'favorite'
+                });
+            } catch (notifErr) {
+                console.error("Notification creation failed:", notifErr);
+            }
+
+            return res.json({
+                success: true,
+                isFavorite: true,
+                message: "Added to favorites"
             });
         }
     } catch (error) {
+        console.error("Toggle Favorite Error:", error);
         res.status(500).json({ success: false, message: error.message });
     }
 };
 
 const getMyFavorites = async (req, res) => {
     try {
-        const userId = req.user.id; // authGuard le pathako ID
+        const userId = req.user.id; 
         const favorites = await Favorite.findAll({
             where: { userId },
-            include: [{
-                model: Doctor,
-                as: 'doctorDetails' // Mathi model ma define gareko name
-            }]
+            include: [
+                {
+                    model: Doctor,
+                    as: 'doctorDetails', 
+                },
+                {
+                    model: Hospital,
+                    as: 'hospitalDetails', 
+                }
+            ]
         });
         res.json({ success: true, favorites });
     } catch (error) {
+        console.error("Get Favorites Error:", error);
         res.status(500).json({ success: false, message: error.message });
     }
 };
 
 const checkFavoriteStatus = async (req, res) => {
-    const { userId, doctorId } = req.body;
+    const { userId, doctorId, hospitalId, type } = req.body;
     try {
-        const favorite = await Favorite.findOne({ where: { userId, doctorId } });
+        let favorite;
+
+        if (type === 'hospital') {
+            favorite = await Favorite.findOne({ where: { userId, hospitalId } });
+        } else {
+            favorite = await Favorite.findOne({ where: { userId, doctorId } });
+        }
+
         res.json({
             success: true,
-            isFavorite: !!favorite // Yedi bhetiyo bhane true, natra false
+            isFavorite: !!favorite
         });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
 };
 
-// Export ma loginUser thapa
+// pp upload
+const uploadProfilePicture = async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ success: false, message: "No file uploaded" });
+        }
+
+        const userId = req.user.id; 
+
+        const imageUrl = `/uploads/profiles/${req.file.filename}`;
+
+        const user = await User.findByPk(userId);
+        if (!user) {
+            return res.status(404).json({ success: false, message: "User not found" });
+        }
+
+        // Delete old picture 
+        if (user.profilePicture && user.profilePicture.startsWith('/uploads/profiles/')) {
+            const oldPath = path.join(__dirname, '..', user.profilePicture);
+            if (fs.existsSync(oldPath)) {
+                fs.unlinkSync(oldPath);
+            }
+        }
+
+        await user.update({ profilePicture: imageUrl });
+
+        res.status(200).json({
+            success: true,
+            message: "Profile picture updated successfully",
+            imageUrl: imageUrl
+        });
+    } catch (error) {
+        console.error("Upload error:", error);
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+const updateProfile = async (req, res) => {
+    try {
+        const { name } = req.body; 
+        const userId = req.user.id;
+
+        if (!name) {
+            return res.status(400).json({ success: false, message: "Name is required" });
+        }
+
+        const user = await User.findByPk(userId);
+        if (!user) {
+            return res.status(404).json({ success: false, message: "User not found" });
+        }
+
+        await user.update({ username: name });
+
+        res.status(200).json({
+            success: true,
+            message: "Profile updated successfully",
+            user: {
+                id: user.id,
+                username: user.username,
+                email: user.email,
+                profilePicture: user.profilePicture
+            }
+        });
+    } catch (error) {
+        console.error("Update profile error:", error);
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+// chnage ps
+const changePassword = async (req, res) => {
+    try {
+        const { currentPassword, newPassword } = req.body;
+        const userId = req.user.id; 
+
+        if (!currentPassword || !newPassword) {
+            return res.status(400).json({ success: false, message: "Please provide both current and new passwords" });
+        }
+
+        const user = await User.findByPk(userId);
+        if (!user) {
+            return res.status(404).json({ success: false, message: "User not found" });
+        }
+
+
+        const isMatch = await bcrypt.compare(currentPassword, user.password);
+        if (!isMatch) {
+            return res.status(400).json({ success: false, message: "Incorrect current password" });
+        }
+
+        const salt = await bcrypt.genSalt(10);
+        user.password = await bcrypt.hash(newPassword, salt);
+        await user.save();
+
+        res.status(200).json({
+            success: true,
+            message: "Password updated successfully. Please log in again."
+        });
+    } catch (error) {
+        console.error("Change password error:", error);
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+
 module.exports = {
     addUser,
     loginUser,
     forgotPassword,
     verifyOTP,
     resetPassword,
-    getAllUsers, // <--- Add this
+    getAllUsers,
     deleteUser,
     getUserCount,
     toggleFavorite,
     getMyFavorites,
-    checkFavoriteStatus
+    checkFavoriteStatus,
+    uploadProfilePicture, 
+    updateProfile,
+    changePassword
+
 };
