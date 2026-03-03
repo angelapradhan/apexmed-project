@@ -13,7 +13,7 @@ const authGuard = (req, res, next) => {
 
     try {
         const decodeData = jwt.verify(token, process.env.JWT_SECRET || "default_secret");
-        req.user = decodeData; // Decode bhayeko data (id, role) req.user ma bascha
+        req.user = decodeData; 
         next();
     } catch (error) {
         res.status(401).json({ success: false, message: "Invalid Token" });
