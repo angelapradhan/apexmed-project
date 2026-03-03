@@ -28,14 +28,20 @@ const User = sequelize.define(
       type: DataTypes.ENUM('user', 'admin'),
       defaultValue: 'user',
     },
+    profilePicture: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      defaultValue: null
+    },
     otp: {
       type: DataTypes.STRING,
       allowNull: true
     },
-    otpexpires: { // Small 'e' for PostgreSQL compatibility
+    otpexpires: { 
       type: DataTypes.DATE,
       allowNull: true
     }
+  
   },
   {
     tableName: "users",
