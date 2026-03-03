@@ -1,7 +1,8 @@
 const { Sequelize } = require("sequelize");
 require("dotenv").config();
 
-// Initialize Sequelize with credentials from your .env file
+
+// Initialize Sequelize 
 const sequelize = new Sequelize(
   process.env.DB_NAME,
   process.env.DB_USER,
@@ -9,22 +10,27 @@ const sequelize = new Sequelize(
   {
     host: process.env.DB_HOST,
     dialect: "postgres",
-    logging: false, // Set to console.log to see SQL queries in terminal
+    logging: false, 
     port: process.env.DB_PORT || 5432,
+    pool: {
+      max: 5,
+      min: 0,
+      acquire: 30000,
+      idle: 10000
+    }
   }
 );
 
-/**
- * Function to authenticate the database connection.
- * It is marked 'async' so it can be awaited in index.js.
- */
+
 const connectDB = async () => {
   try {
     await sequelize.authenticate();
     console.log("PostgreSQL connected successfully.");
+    await sequelize.sync({ alter: true }); 
+    console.log("Database models synced successfully.");
   } catch (error) {
     console.error("Unable to connect to the database:", error);
-    throw error; // This 'throw' is critical for the catch block in index.js
+    throw error; 
   }
 };
 
