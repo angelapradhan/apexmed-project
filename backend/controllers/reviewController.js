@@ -1,12 +1,14 @@
 const Review = require('../models/reviewModel');
+const Doctor = require('../models/services');
+const User = require('../models/user');
 
-// 1. Post a new review
+// post a review
 exports.postReview = async (req, res) => {
   try {
-    const { doctorId, userId, userName, comment } = req.body; // <-- doctorId lincha
+    const { doctorId, userId, userName, comment } = req.body; 
     
     const newReview = await Review.create({
-      doctorId, // <-- seedha doctorId halne
+      doctorId, 
       userId,
       userName,
       comment
@@ -18,32 +20,55 @@ exports.postReview = async (req, res) => {
   }
 };
 
+exports.getAllReviews = async (req, res) => {
+    try {
+        const reviews = await Review.findAll({
+            include: [
+                {
+                    model: User,
+                    attributes: ['username', 'email'] 
+                },
+                {
+                    model: Doctor,
+                    attributes: ['doctorName']
+                }
+            ],
+            order: [['createdAt', 'DESC']],
+        });
+        res.status(200).json(reviews);
+    } catch (error) {
+        console.error("Error fetching all reviews:", error);
+        res.status(500).json({ message: "Failed to fetch reviews", error: error.message });
+    }
+};
+
 exports.getReviewsByUser = async (req, res) => {
   try {
     const { userId } = req.params;
     
-    // Ensure this model matches the table structure
     const reviews = await Review.findAll({
-      where: { userId: userId }, // Verify data types match
+      where: { userId: userId },
+      include: [{
+        model: Doctor,
+        attributes: ['doctorName', 'specialization', 'doctorImage']
+      }],
       order: [['createdAt', 'DESC']],
     });
 
     res.status(200).json(reviews);
   } catch (error) {
-    // This is likely where the 500 error is caught
     console.error("Database Error:", error); 
     res.status(500).json({ message: "Failed to fetch reviews", error: error.message });
   }
 };
 
-// 2. Get reviews for a specific doctor
 exports.getReviewsByDoctor = async (req, res) => {
   try {
-    const { doctorId } = req.params; // <-- doctorId lincha
+    const { doctorId } = req.params; 
     
     const reviews = await Review.findAll({
       where: { doctorId },
-      order: [['createdAt', 'DESC']], // Naya review mathi dekhauna
+      order: [['createdAt', 'DESC']], 
     });
 
     res.status(200).json(reviews);
@@ -52,7 +77,7 @@ exports.getReviewsByDoctor = async (req, res) => {
   }
 };
 
-// 3. Delete a review (Admin View)
+// delete review
 exports.deleteReview = async (req, res) => {
   try {
     const { reviewId } = req.params;
