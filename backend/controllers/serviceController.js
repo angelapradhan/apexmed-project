@@ -2,7 +2,6 @@ const Service = require("../models/services");
 
 const addService = async (req, res) => {
     try {
-        // Debugging ko lagi terminal ma herne
         console.log("Form Data Received:", req.body);
         console.log("File Received:", req.file);
 
@@ -24,7 +23,7 @@ const addService = async (req, res) => {
 
         const doctorImage = req.file ? req.file.filename : null; 
 
-        // Validation - main kura haru xutnu bhayena
+        // validation 
         if (!doctorName || !doctorImage || !specialization || !price) {
             return res.status(400).json({ 
                 success: false, 
@@ -38,7 +37,6 @@ const addService = async (req, res) => {
             price: Number(price),
             availableTime: availableTime || "9:00 AM - 5:00 PM",
             doctorImage,
-            // Naya fields haru thapiyeko
             rating: rating || "4.8",
             patients: patients || "1500+",
             gender: gender || "Male",
@@ -49,6 +47,13 @@ const addService = async (req, res) => {
             email,
             bio
         });
+
+        res.status(201).json({ 
+            success: true, 
+            message: "Doctor Profile Registered Successfully!", 
+            service: newService 
+        });
+
 
         res.status(201).json({ 
             success: true, 
@@ -67,7 +72,7 @@ const addService = async (req, res) => {
 
 const getAllServices = async (req, res) => {
     try {
-        // Sabai data tanne (ani naya doctor list ko mathi aaosh bhanera DESC order)
+        // Sabai data tanne
         const services = await Service.findAll({ order: [['id', 'DESC']] });
         res.status(200).json({ success: true, services });
     } catch (error) {
