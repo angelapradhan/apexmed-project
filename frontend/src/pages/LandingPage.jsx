@@ -1,12 +1,12 @@
 import React, { useState, useRef } from 'react';
-import { useNavigate } from 'react-router-dom'; // Navigation ko lagi
+import { useNavigate } from 'react-router-dom';
 import { 
   Activity, Heart, Calendar, Users, 
   Stethoscope, Clock, MapPin, Phone, 
   Mail, Facebook, Twitter, Youtube 
 } from 'lucide-react';
 
-// --- Assets ---
+
 import logo from '../assets/logo.png';
 import landingPic from '../assets/landingpic.jpg';
 import drEmma from '../assets/Dr.EmmaWilson.jpg';
@@ -16,7 +16,7 @@ import doctorImg from '../assets/doctor.png';
 
 const LandingPage = () => {
   const [activeDropdown, setActiveDropdown] = useState(null);
-  const navigate = useNavigate(); // Navigation function initialize gareko
+  const navigate = useNavigate(); 
   
   const doctorsSectionRef = useRef(null);
   const servicesSectionRef = useRef(null);
@@ -44,7 +44,7 @@ const LandingPage = () => {
   return (
     <div className="min-h-screen bg-white text-slate-900 font-sans selection:bg-blue-100">
       
-      {/* --- 1. NAVIGATION --- */}
+      {/* navigation*/}
       <nav className="flex items-center justify-between px-6 md:px-20 py-6 bg-white sticky top-0 z-50">
         <div className="flex items-center gap-2 cursor-pointer" onClick={() => window.location.reload()}>
           <img src={logo} alt="ApexMed Logo" className="h-8 w-auto" />
@@ -75,7 +75,6 @@ const LandingPage = () => {
         </button>
       </nav>
 
-      {/* --- 2. HERO SECTION --- */}
       <header className="px-6 md:px-20 pt-8 pb-12 relative overflow-hidden bg-white mb-12">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center">
           <div className="md:w-1/2 space-y-7 z-10 text-center md:text-left">
@@ -102,7 +101,7 @@ const LandingPage = () => {
         </div>
       </header>
 
-      {/* --- 3. QUICK ACTION CARDS --- */}
+
       <section className="px-6 md:px-20 py-12 relative z-20">
         <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           <div className="bg-blue-500 p-8 rounded-[40px] text-white shadow-2xl shadow-blue-200">
@@ -133,7 +132,6 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* --- 4. MEDICAL SERVICES --- */}
       <section ref={servicesSectionRef} className="pt-28 pb-10 px-6 md:px-20 bg-white overflow-hidden">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-20">
@@ -159,7 +157,7 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* --- 5. SPECIALITY BANNER --- */}
+      {/* speciality banner */}
       <section className="py-10 px-6 md:px-20">
         <div className="max-w-7xl mx-auto">
           <div className="bg-blue-500 rounded-[50px] p-10 md:p-16 flex flex-col md:flex-row items-center justify-between text-white relative overflow-hidden shadow-2xl">
@@ -179,7 +177,7 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* --- 6. DOCTORS GRID --- */}
+
       <section ref={doctorsSectionRef} className="py-28 px-6 md:px-20 bg-[#f8fbff]">
         <div className="max-w-7xl mx-auto text-center">
           <span className="text-blue-400 font-bold text-xs uppercase tracking-[0.4em]">Team</span>
@@ -192,7 +190,7 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* --- 7. FOOTER / CONTACT --- */}
+
       <footer ref={footerSectionRef} className="bg-[#1b1a1a] text-white pt-16 pb-8 px-6 md:px-20 mt-20">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row items-center justify-between border-t border-white/10 pt-8 gap-8">
@@ -213,7 +211,7 @@ const LandingPage = () => {
   );
 };
 
-// --- SUB-COMPONENTS ---
+
 const NavDropdown = ({ title, content }) => (
   <div className="absolute top-12 left-1/2 -translate-x-1/2 w-64 bg-white rounded-2xl shadow-2xl border border-slate-100 p-5 z-100 animate-in fade-in zoom-in duration-200">
     <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-white border-t border-l border-slate-100 rotate-45"></div>

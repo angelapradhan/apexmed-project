@@ -49,7 +49,7 @@ const Register = () => {
     >
       <div className="absolute inset-0 bg-white/30 backdrop-blur-[2px]"></div>
 
-      {/* --- LEFT SIDE: Branding --- */}
+
       <div className="hidden md:flex md:w-1/2 items-center justify-start p-16 md:p-20 relative z-10">
         <div className="max-w-md md:ml-12">
           <h1 className="text-4xl md:text-5xl font-extrabold text-[#1e293b] leading-tight mb-6 drop-shadow-sm tracking-tight">
@@ -61,7 +61,7 @@ const Register = () => {
         </div>
       </div>
 
-      {/* --- RIGHT SIDE --- */}
+
       <div className="flex-1 flex items-center justify-center p-4 relative z-10">
         <div className="w-full max-w-[420px] bg-white/90 backdrop-blur-md rounded-[28px] p-8 shadow-xl border border-white/50">
           

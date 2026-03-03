@@ -6,14 +6,15 @@ import {
   getReviewsApi,
   postReviewApi,
   deleteReviewApi,
-  createNotificationApi // 🌟 1. IMPORTANT: Import this 🌟
+  createNotificationApi
 } from '../services/api';
 
 // Icons
 import {
   ArrowLeft, Star, Calendar, Users, GraduationCap,
   Award, Phone, Mail, User, X, Heart, Trash2, SendHorizontal,
-  CalendarDays
+  CalendarDays,
+  Hash 
 } from 'lucide-react';
 
 const DoctorDetailPage = () => {
@@ -30,13 +31,12 @@ const DoctorDetailPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState('');
   const [currentUser, setCurrentUser] = useState({ name: '', email: '', id: '' });
-
-  // --- REVIEW STATE ---
   const [reviews, setReviews] = useState([]);
   const [newReview, setNewReview] = useState('');
 
-  // View Check: Admin View or User View
+
   const isAdminView = location.pathname.startsWith('/admin');
+  const doctorId = doctor?.id || doctor?._id;
 
   // Fetch User and Reviews
   useEffect(() => {
@@ -48,8 +48,6 @@ const DoctorDetailPage = () => {
         email: storedUser.email || "User Email"
       });
     }
-
-    // Fetch reviews for this doctor
     if (doctor) {
       fetchReviews();
     }
@@ -57,7 +55,6 @@ const DoctorDetailPage = () => {
 
   const fetchReviews = async () => {
     try {
-      const doctorId = doctor?.id || doctor?._id;
       if (!doctorId) return;
 
       const response = await getReviewsApi(doctorId);
@@ -76,7 +73,7 @@ const DoctorDetailPage = () => {
     if (!currentUser.id) return alert("Please login to comment.");
 
     const payload = {
-      doctorId: doctor.id || doctor?._id,
+      doctorId: doctorId,
       userId: currentUser.id,
       userName: currentUser.name,
       comment: newReview
@@ -86,7 +83,7 @@ const DoctorDetailPage = () => {
       const response = await postReviewApi(payload);
       if (response.status === 201) {
         setNewReview('');
-        fetchReviews(); // Refresh reviews
+        fetchReviews();
         alert("Feedback posted successfully!");
       }
     } catch (error) {
@@ -106,7 +103,7 @@ const DoctorDetailPage = () => {
 
     try {
       await deleteReviewApi(reviewId);
-      fetchReviews(); // Refresh reviews
+      fetchReviews(); 
       alert("Review deleted successfully!");
     } catch (error) {
       console.error("Error deleting review:", error);
@@ -115,12 +112,11 @@ const DoctorDetailPage = () => {
     }
   };
 
-  // Favorite status check (User side only)
+  // Favorite status check 
   useEffect(() => {
     const fetchStatus = async () => {
       const storedUser = JSON.parse(localStorage.getItem('user'));
       const userId = storedUser?.id || storedUser?._id;
-      const doctorId = doctor?.id || doctor?._id;
 
       if (userId && doctorId && !isAdminView) {
         try {
@@ -138,12 +134,10 @@ const DoctorDetailPage = () => {
       }
     };
     fetchStatus();
-  }, [doctor, isAdminView]);
+  }, [doctor, isAdminView, doctorId]);
 
-  // --- API Base URL for Images ---
   const API_BASE_URL = 'http://localhost:3000';
 
-  // --- Smart Back Button ---
   const handleBack = () => {
     if (isAdminView) {
       navigate('/admin/appointments');
@@ -152,17 +146,14 @@ const DoctorDetailPage = () => {
     }
   };
 
-  // ==========================================
-  // 🌟 2. UPDATED: Favorite Toggle & Notif 🌟
-  // ==========================================
   const toggleFavorite = async () => {
     const storedUser = JSON.parse(localStorage.getItem('user'));
     if (!storedUser) return alert("Please login first!");
 
     const payload = {
       userId: storedUser.id || storedUser._id,
-      doctorId: doctor.id || doctor._id,
-      type: 'doctor' // Added type
+      doctorId: doctorId,
+      type: 'doctor'
     };
 
     try {
@@ -172,10 +163,9 @@ const DoctorDetailPage = () => {
         if (res.data.isFavorite) {
           alert("✨ Added to Favourites!");
           
-          // 🌟 3. CREATE NOTIFICATION FOR ADMIN 🌟
           try {
             await createNotificationApi({
-              userId: 'ADMIN', // Send to admin panel
+              userId: 'ADMIN', 
               title: 'New Favorite Doctor',
               message: `${storedUser.username} added Dr. ${doctor.doctorName} to favorites.`,
               type: 'favorite'
@@ -184,7 +174,6 @@ const DoctorDetailPage = () => {
           } catch (notifErr) {
             console.error("Failed to notify admin:", notifErr);
           }
-          // ------------------------------------
           
         } else {
           alert("Removed from Favourites.");
@@ -210,20 +199,19 @@ const DoctorDetailPage = () => {
     setIsModalOpen(true);
   };
 
-  // --- Smart Final Booking Redirect ---
   const handleFinalBooking = async (e) => {
     e.preventDefault();
     if (!phoneNumber) return alert("Phone number is required!");
     if (!currentUser.id) return alert("User not logged in!");
 
     const finalBookingPayload = {
-      doctorId: doctor.id || doctor?._id,
+      doctorId: doctorId,
       doctorName: doctor.doctorName,
       doctorImage: doctor.doctorImage,
       patientName: currentUser.name,
       patientEmail: currentUser.email,
       patientPhone: phoneNumber,
-      date: selectedDate, // YYYY-MM-DD
+      date: selectedDate, 
       time: selectedTime,
       type: appointmentType,
       fee: doctor.price
@@ -305,6 +293,13 @@ const DoctorDetailPage = () => {
               <div className="text-center mb-3">
                 <h3 className="text-lg font-black text-slate-800 tracking-tight leading-tight">{doctor.doctorName}</h3>
                 <p className="text-blue-500 font-bold text-[9px] uppercase tracking-[0.15em] mt-1">{doctor.specialization}</p>
+                
+                <div className="flex items-center justify-center gap-1.5 mt-2 bg-slate-100 px-3 py-1 rounded-full w-fit mx-auto">
+                    <Hash size={10} className="text-slate-400" />
+                    <span className="text-[10px] font-bold text-slate-500 tracking-wider">
+                        Doctor ID: {doctorId}
+                    </span>
+                </div>
               </div>
               <div className="w-full bg-slate-50/80 rounded-2xl p-3 border border-slate-100">
                 <p className="text-[10px] text-slate-500 leading-relaxed text-center font-bold italic">
@@ -388,7 +383,7 @@ const DoctorDetailPage = () => {
           </div>
         </div>
 
-        {/* RIGHT COLUMN: Booking & Stats */}
+        {/* Booking & Stats */}
         <div className="lg:col-span-7 xl:col-span-8 space-y-6">
           <div className="grid grid-cols-3 gap-4">
             <StatBox label="Experience" value={doctor.experience || "N/A"} icon={<Calendar size={16} />} />
@@ -396,7 +391,6 @@ const DoctorDetailPage = () => {
             <StatBox label="Rating" value={doctor.rating || "4.8"} icon={<Star size={16} />} />
           </div>
 
-          {/* Conditional Rendering for Booking Area */}
           {isAdminView ? (
             <div className="bg-white rounded-[40px] p-8 lg:p-10 shadow-sm border border-slate-50 text-center">
               <p className="text-slate-500 font-bold">Admin View: Doctor details management</p>
@@ -412,7 +406,7 @@ const DoctorDetailPage = () => {
                     type="date"
                     value={selectedDate}
                     onChange={(e) => setSelectedDate(e.target.value)}
-                    min={new Date().toISOString().split('T')[0]} // Past dates disable
+                    min={new Date().toISOString().split('T')[0]} 
                     className="w-full pl-14 pr-6 py-5 rounded-2xl bg-slate-50 border border-slate-100 focus:border-blue-500 outline-none text-slate-800 font-black text-sm transition-all"
                   />
                 </div>
@@ -520,7 +514,6 @@ const DoctorDetailPage = () => {
   );
 };
 
-// Reusable Components
 const InfoRow = ({ label, value, icon }) => (
   <div className="flex items-center justify-between border-b border-slate-50 pb-2 last:border-0 last:pb-0">
     <div className="flex items-center gap-2.5">

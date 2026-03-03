@@ -1,24 +1,21 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { User, Bell, Trash2, Camera, ShieldCheck, Mail, Lock, X, Eye, EyeOff } from 'lucide-react'; // 🌟 Removed Moon icon 🌟
-// Import functions from your api.js
+import { User, Bell, Trash2, Camera, ShieldCheck, Mail, Lock, X, Eye, EyeOff } from 'lucide-react'; 
 import { uploadProfilePictureApi, updateProfileApi, changePasswordApi } from '../services/api';
 import { toast } from 'react-hot-toast';
 
 const SettingsPage = () => {
-  // --- 🌟 REMOVED DARK MODE STATE 🌟 ---
-  
-  // 🌟 FIX: Load notification state from localStorage 🌟
+
   const [notifications, setNotifications] = useState(
-    localStorage.getItem('notificationsEnabled') !== 'false' // Default true if not set
+    localStorage.getItem('notificationsEnabled') !== 'false' 
   );
 
-  // --- 1. State for User Data & Modal ---
+  // state
   const [profilePreview, setProfilePreview] = useState("https://ui-avatars.com/api/?name=User&background=1b63fb&color=fff&size=128");
   const [fullName, setFullName] = useState("");
   const [userEmail, setUserEmail] = useState("");
   const [userId, setUserId] = useState("...");
   
-  // Modal States for Success Messages
+  // Modal States
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
   const [modalTitle, setModalTitle] = useState("Success");
@@ -28,7 +25,7 @@ const SettingsPage = () => {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   
-  // 🌟 Visibility Toggles 🌟
+  // Visibility Toggles 
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -38,7 +35,7 @@ const SettingsPage = () => {
 
   const fileInputRef = useRef(null);
 
-  // Load user data on mount
+
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem('user'));
     if (user) {
@@ -46,14 +43,13 @@ const SettingsPage = () => {
       setUserEmail(user.email || "No Email");
       setUserId(user.id || user._id);
 
-      // Set Profile Picture
       if (user.profilePicture) {
         setProfilePreview(`http://localhost:3000${user.profilePicture}`);
       }
     }
   }, []);
 
-  // --- 2. Handle File Selection ---
+
   const handleFileChange = async (event) => {
     const file = event.target.files[0];
     if (file) {
@@ -66,7 +62,7 @@ const SettingsPage = () => {
     }
   };
 
-  // --- 3. Upload Profile Picture ---
+  // upload pp
   const handleUpload = async (file) => {
     try {
       const formData = new FormData();
@@ -76,12 +72,10 @@ const SettingsPage = () => {
       if (response.data.success) {
         toast.success("Profile picture updated!");
 
-        // Update local storage to persist change
         const user = JSON.parse(localStorage.getItem('user'));
         user.profilePicture = response.data.imageUrl;
         localStorage.setItem('user', JSON.stringify(user));
 
-        // Update profile preview state with new image
         setProfilePreview(`http://localhost:3000${response.data.imageUrl}`);
       }
     } catch (error) {
@@ -90,36 +84,33 @@ const SettingsPage = () => {
     }
   };
 
-  // --- 4. Update Profile (Name) - API Call with Modal Success ---
+
   const handleUpdateProfile = async () => {
     try {
-      // API call to update name in the backend
+
       const response = await updateProfileApi({ name: fullName }); 
 
       if (response.data.success) {
-        // SET SUCCESS MESSAGE FOR MODAL
         setModalTitle("Profile Updated");
         setModalMessage("Your profile name has been updated successfully!");                
-        setIsModalOpen(true); // Open Modal
+        setIsModalOpen(true); 
 
-        // Update local storage to persist change
         const user = JSON.parse(localStorage.getItem('user'));
-        user.name = fullName; // Update name in local storage
+        user.name = fullName; 
         localStorage.setItem('user', JSON.stringify(user));
       }
     } catch (error) {
       console.error("Update error:", error);
-      // Still use toast for errors
+
       toast.error("Failed to update profile. " + (error.response?.data?.message || ""));
     }
   };
 
-  // --- 5. Change Password - API Call with Validation ---
+  //chnage ps
   const handleChangePassword = async () => {
-    // RESET ERROR STATE
+
     setPasswordError("");
     
-    // Basic Validation
     if (!currentPassword || !newPassword || !confirmPassword) {
       setPasswordError("Please fill all password fields");
       return;
@@ -130,7 +121,6 @@ const SettingsPage = () => {
     }
 
     try {
-      // CALL BACKEND API TO CHANGE PASSWORD
       const response = await changePasswordApi({ 
         currentPassword, 
         newPassword 
@@ -141,33 +131,30 @@ const SettingsPage = () => {
         setModalMessage("Your password has been changed successfully. Please log in again.");
         setIsModalOpen(true);
 
-        // Clear password fields
         setCurrentPassword("");
         setNewPassword("");
         setConfirmPassword("");
         setPasswordError("");
         
-        // LOGOUT USER AFTER PASSWORD CHANGE
         localStorage.removeItem('token');
         localStorage.removeItem('user');
-        
-        // REDIRECT TO LOGIN PAGE
+
         setTimeout(() => {
             window.location.href = '/login'; 
-        }, 2000); // Wait 2 seconds for modal to be seen
+        }, 2000);
       }
     } catch (error) {
       console.error("Password update error:", error);
-      // SET PASSWORD ERROR MESSAGE FROM BACKEND (E.G. WRONG CURRENT PASSWORD)
+
       setPasswordError(error.response?.data?.message || "Failed to change password");
     }
   };
 
-  // --- 🌟 Updated Notification Toggle Handler 🌟 ---
+
   const handleNotificationToggle = () => {
     const newValue = !notifications;
     setNotifications(newValue);
-    localStorage.setItem('notificationsEnabled', newValue); // 🌟 SAVE TO LOCALSTORAGE 🌟
+    localStorage.setItem('notificationsEnabled', newValue); 
     
     if (newValue) {
       toast.success("Notifications enabled!");
@@ -179,11 +166,10 @@ const SettingsPage = () => {
   return (
     <div className="space-y-6">
       
-      {/* 6. MODAL DIALOG COMPONENT */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 backdrop-blur-sm">
           <div className="bg-white p-6 rounded-2xl shadow-xl w-96 relative">
-            {/* Close Button Icon */}
+
             <button 
               onClick={() => setIsModalOpen(false)} 
               className="absolute top-4 right-4 text-slate-400 hover:text-slate-600"
@@ -194,7 +180,6 @@ const SettingsPage = () => {
             <h3 className="text-lg font-bold text-slate-800 mb-2">{modalTitle}</h3>
             <p className="text-sm text-slate-600 mb-5">{modalMessage}</p>
             
-            {/* Close Button */}
             <button 
               onClick={() => setIsModalOpen(false)}
               className="w-full bg-blue-600 text-white py-2 rounded-xl text-sm font-semibold hover:bg-blue-700"
@@ -209,7 +194,6 @@ const SettingsPage = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
 
-        {/* LEFT SIDE: Profile Card */}
         <div className="lg:col-span-1">
           <div className="bg-white/80 backdrop-blur-sm rounded-[24px] p-6 border border-white shadow-sm text-center">
             <div className="relative w-24 h-24 mx-auto mb-4">
@@ -235,7 +219,6 @@ const SettingsPage = () => {
               </button>
             </div>
 
-            {/* Display Dynamic User Data */}
             <h4 className="text-sm font-bold text-slate-800">{fullName || "Loading..."}</h4>
             <div className="flex items-center justify-center gap-1.5 mt-1 text-slate-500">
               <Mail size={12} />
@@ -245,10 +228,8 @@ const SettingsPage = () => {
           </div>
         </div>
 
-        {/* RIGHT SIDE: Forms & Preferences */}
         <div className="lg:col-span-3 space-y-5">
           
-          {/* --- PERSONAL DETAILS BOX --- */}
           <div className="bg-white/80 backdrop-blur-sm rounded-[24px] p-6 border border-white shadow-sm">
             <h4 className="text-xs font-bold text-slate-800 mb-5 flex items-center gap-2 uppercase tracking-tight">
               <User size={14} className="text-blue-600" /> Personal Details
@@ -257,7 +238,7 @@ const SettingsPage = () => {
               <InputGroup
                 label="Full Name"
                 value={fullName}
-                // Allows editing of the state
+
                 onChange={(e) => setFullName(e.target.value)}
               />
               <InputGroup
@@ -268,7 +249,7 @@ const SettingsPage = () => {
               />
               <div className="md:col-span-2 flex justify-end mt-2">
                 <button 
-                  // Triggers API call and opens modal on click
+
                   onClick={handleUpdateProfile} 
                   className="bg-blue-600 text-white px-6 py-2 rounded-xl text-[11px] font-bold shadow-lg shadow-blue-100 hover:bg-blue-700 transition-all active:scale-95"
                 >
@@ -277,15 +258,13 @@ const SettingsPage = () => {
               </div>
             </div>
           </div>
-          
-          {/* --- CHANGE PASSWORD BOX --- */}
+
           <div className="bg-white/80 backdrop-blur-sm rounded-[24px] p-6 border border-white shadow-sm">
             <h4 className="text-xs font-bold text-slate-800 mb-5 flex items-center gap-2 uppercase tracking-tight">
               <Lock size={14} className="text-blue-600" /> Change Password
             </h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              
-              {/* Current Password - Full Width with Toggle */}
+
               <div className="md:col-span-2 relative">
                 <InputGroup 
                   label="Current Password" 
@@ -294,7 +273,7 @@ const SettingsPage = () => {
                   value={currentPassword}
                   onChange={(e) => setCurrentPassword(e.target.value)}
                 />
-                {/* Toggle Button */}
+
                 <button 
                   type="button" 
                   onClick={() => setShowCurrentPassword(!showCurrentPassword)}
@@ -304,7 +283,7 @@ const SettingsPage = () => {
                 </button>
               </div>
 
-              {/* New Password & Confirm Password - Side by Side with Toggles */}
+
               <div className="relative">
                 <InputGroup 
                   label="New Password" 
@@ -338,7 +317,7 @@ const SettingsPage = () => {
                 </button>
               </div>
               
-              {/* ERROR TEXT IN RED */}
+
               {passwordError && (
                 <div className="md:col-span-2 text-red-500 text-[10px] font-semibold -mt-2">
                   {passwordError}
@@ -362,15 +341,13 @@ const SettingsPage = () => {
               <ShieldCheck size={14} className="text-blue-600" /> Preferences
             </h4>
             <div className="space-y-3">
-              {/* 🌟 REMOVED DARK MODE TOGGLE 🌟 */}
-              
-              {/* 🌟 UPDATED NOTIFICATION TOGGLE 🌟 */}
+
               <ToggleRow 
                 icon={<Bell size={14} />} 
                 title="Notifications" 
                 desc="Alerts for appointments" 
                 active={notifications} 
-                onToggle={handleNotificationToggle} // 🌟 CALL HANDLER 🌟
+                onToggle={handleNotificationToggle}
               />
               
               <div className="flex items-center justify-between p-3 bg-red-50/30 rounded-xl border border-red-50 mt-4 group cursor-pointer hover:bg-red-50 transition-all">
@@ -395,7 +372,7 @@ const SettingsPage = () => {
   );
 };
 
-/* --- REUSABLE SUB-COMPONENTS --- */
+
 const InputGroup = ({ label, type = "text", value, onChange, placeholder, disabled = false, title }) => (
   <div className="flex flex-col gap-1.5" title={title}>
     <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide ml-1">{label}</label>

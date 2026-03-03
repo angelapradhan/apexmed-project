@@ -4,7 +4,6 @@ import {
   Home, 
   Calendar, 
   Heart, 
-  LayoutGrid, 
   Star, 
   Settings, 
   LogOut 
@@ -13,9 +12,9 @@ import myLogo from '../../assets/white-logo.png';
 
 const Sidebar = () => {
   return (
-    <nav className="hidden md:flex flex-col items-start py-6 bg-white/70 backdrop-blur-md rounded-[28px] shadow-sm border border-white h-[calc(100vh-2rem)] sticky top-4 transition-all duration-300 ease-in-out w-16 hover:w-60 group overflow-hidden z-50">
+    <nav className="hidden md:flex flex-col items-start py-6 bg-white/80 backdrop-blur-md rounded-[28px] shadow-sm border border-white h-[calc(100vh-2rem)] sticky top-4 transition-all duration-300 ease-in-out w-16 hover:w-60 group overflow-hidden z-50">
       
-      {/* Logo Section - ApexMed */}
+      {/* Logo Section */}
       <div className="flex items-center w-full mb-10 px-3"> 
         <div className="flex items-center justify-center bg-blue-600 w-10 h-10 rounded-xl shadow-md shadow-blue-100 shrink-0 overflow-hidden">
           <img 
@@ -29,12 +28,11 @@ const Sidebar = () => {
         </span>
       </div>
       
-      {/* Sidebar Links - More compact gap */}
+      {/* Sidebar Links */}
       <div className="flex flex-col gap-4 w-full flex-1 px-2.5">
         <SidebarItem to="/dashboard" icon={<Home size={20} />} label="Home Page" />
         <SidebarItem to="/appointments" icon={<Calendar size={20} />} label="My Appointments" />
         <SidebarItem to="/favourites" icon={<Heart size={20} />} label="Favourites" />
-        <SidebarItem to="/services" icon={<LayoutGrid size={20} />} label="Services" />
         <SidebarItem to="/reviews" icon={<Star size={20} />} label="Reviews" />
         <SidebarItem to="/settings" icon={<Settings size={20} />} label="Settings" />
       </div>
@@ -47,7 +45,6 @@ const Sidebar = () => {
   );
 };
 
-/* --- COMPACT SUB-COMPONENT --- */
 const SidebarItem = ({ icon, label, to, isLogout = false }) => (
   <NavLink 
     to={to} 
@@ -55,7 +52,7 @@ const SidebarItem = ({ icon, label, to, isLogout = false }) => (
   >
     {({ isActive }) => (
       <>
-        {/* Icon Container - Smaller padding and radius */}
+
         <div className={`p-2.5 rounded-xl transition-all duration-300 shrink-0 ${
           isActive 
             ? 'bg-blue-600 text-white shadow-md' 
@@ -66,7 +63,6 @@ const SidebarItem = ({ icon, label, to, isLogout = false }) => (
           {icon}
         </div>
 
-        {/* Label - Smaller text-xs and margin */}
         <span className={`font-bold text-xs transition-opacity duration-300 whitespace-nowrap opacity-0 group-hover:opacity-100 ml-3 ${
           isActive 
             ? 'text-blue-600' 
